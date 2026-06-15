@@ -1,63 +1,12 @@
-import type { GetCatalogOptions, ProductCreate, ProductUpdate, SocketConfig, WAMediaUpload } from '../Types/index.js';
-import type { UpdateBussinesProfileProps } from '../Types/Bussines.js';
-import { type BinaryNode } from '../WABinary/index.js';
-export declare const makeBusinessSocket: (config: SocketConfig) => {
-    logger: import("../Utils/logger.js").ILogger;
-    getOrderDetails: (orderId: string, tokenBase64: string) => Promise<import("../index.js").OrderDetails>;
-    getCatalog: ({ jid, limit, cursor }: GetCatalogOptions) => Promise<{
-        products: import("../index.js").Product[];
-        nextPageCursor: string | undefined;
-    }>;
-    getCollections: (jid?: string, limit?: number) => Promise<{
-        collections: import("../index.js").CatalogCollection[];
-    }>;
-    productCreate: (create: ProductCreate) => Promise<import("../index.js").Product>;
-    productDelete: (productIds: string[]) => Promise<{
-        deleted: number;
-    }>;
-    productUpdate: (productId: string, update: ProductUpdate) => Promise<import("../index.js").Product>;
-    updateBussinesProfile: (args: UpdateBussinesProfileProps) => Promise<any>;
-    updateCoverPhoto: (photo: WAMediaUpload) => Promise<number>;
-    removeCoverPhoto: (id: string) => Promise<any>;
-    sendMessageAck: (node: BinaryNode, errorCode?: number) => Promise<void>;
-    sendRetryRequest: (node: BinaryNode, forceIncludeKeys?: boolean) => Promise<void>;
-    rejectCall: (callId: string, callFrom: string) => Promise<void>;
-    fetchMessageHistory: (count: number, oldestMsgKey: import("../index.js").WAMessageKey, oldestMsgTimestamp: number | import("long").default) => Promise<string>;
-    requestPlaceholderResend: (messageKey: import("../index.js").WAMessageKey, msgData?: Partial<import("../index.js").WAMessage>) => Promise<string | undefined>;
-    messageRetryManager: import("../index.js").MessageRetryManager | null;
-    userDevicesCache: import("../index.js").PossiblyExtendedCacheStore | import("@cacheable/node-cache").NodeCache<import("../index.js").JidWithDevice[]>;
-    devicesMutex: {
-        mutex<T>(code: () => Promise<T> | T): Promise<T>;
-    };
-    issuePrivacyTokens: (jids: string[], timestamp?: number) => Promise<any>;
-    assertSessions: (jids: string[], force?: boolean) => Promise<boolean>;
-    relayMessage: (jid: string, message: import("../index.js").proto.IMessage, { messageId: msgId, participant, additionalAttributes, additionalNodes, useUserDevicesCache, useCachedGroupMetadata, statusJidList }: import("../index.js").MessageRelayOptions) => Promise<string>;
-    sendReceipt: (jid: string, participant: string | undefined, messageIds: string[], type: import("../index.js").MessageReceiptType) => Promise<void>;
-    sendReceipts: (keys: import("../index.js").WAMessageKey[], type: import("../index.js").MessageReceiptType) => Promise<void>;
-    readMessages: (keys: import("../index.js").WAMessageKey[]) => Promise<void>;
-    refreshMediaConn: (forceGet?: boolean) => Promise<import("../index.js").MediaConnInfo>;
-    getMediaHost: () => string;
-    waUploadToServer: import("../index.js").WAMediaUploadFunction;
-    fetchPrivacySettings: (force?: boolean) => Promise<{
-        [_: string]: string;
-    }>;
-    sendPeerDataOperationMessage: (pdoMessage: import("../index.js").proto.Message.IPeerDataOperationRequestMessage) => Promise<string>;
-    createParticipantNodes: (recipientJids: string[], message: import("../index.js").proto.IMessage, extraAttrs?: BinaryNode["attrs"], dsmMessage?: import("../index.js").proto.IMessage) => Promise<{
-        nodes: BinaryNode[];
-        shouldIncludeDeviceIdentity: boolean;
-    }>;
-    getUSyncDevices: (jids: string[], useCache: boolean, ignoreZeroDevices: boolean) => Promise<(import("../index.js").JidWithDevice & {
-        jid: string;
-    })[]>;
-    updateMemberLabel: (jid: string, memberLabel: string) => Promise<string>;
-    updateMediaMessage: (message: import("../index.js").WAMessage) => Promise<import("../index.js").WAMessage>;
-    sendMessage: (jid: string, content: import("../index.js").AnyMessageContent, options?: import("../index.js").MiscMessageGenerationOptions) => Promise<import("../index.js").WAMessage | undefined>;
-    newsletterCreate: (name: string, description?: string) => Promise<import("../index.js").NewsletterMetadata>;
-    newsletterUpdate: (jid: string, updates: import("../index.js").NewsletterUpdate) => Promise<unknown>;
+import type { SocketConfig, WAMediaUpload } from '../Types/index.js';
+import type { NewsletterMetadata, NewsletterUpdate } from '../Types/index.js';
+export declare const makeNewsletterSocket: (config: SocketConfig) => {
+    newsletterCreate: (name: string, description?: string) => Promise<NewsletterMetadata>;
+    newsletterUpdate: (jid: string, updates: NewsletterUpdate) => Promise<unknown>;
     newsletterSubscribers: (jid: string) => Promise<{
         subscribers: number;
     }>;
-    newsletterMetadata: (type: "invite" | "jid", key: string) => Promise<import("../index.js").NewsletterMetadata | null>;
+    newsletterMetadata: (type: "invite" | "jid", key: string) => Promise<NewsletterMetadata | null>;
     newsletterFollow: (jid: string) => Promise<unknown>;
     newsletterUnfollow: (jid: string) => Promise<unknown>;
     newsletterMute: (jid: string) => Promise<unknown>;
@@ -89,7 +38,7 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
     groupParticipantsUpdate: (jid: string, participants: string[], action: import("../index.js").ParticipantAction) => Promise<{
         status: string;
         jid: string | undefined;
-        content: BinaryNode;
+        content: import("../index.js").BinaryNode;
     }[]>;
     groupUpdateDescription: (jid: string, description?: string) => Promise<void>;
     groupInviteCode: (jid: string) => Promise<string | undefined>;
@@ -126,6 +75,9 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
     notificationMutex: {
         mutex<T>(code: () => Promise<T> | T): Promise<T>;
     };
+    fetchPrivacySettings: (force?: boolean) => Promise<{
+        [_: string]: string;
+    }>;
     upsertMessage: (msg: import("../index.js").WAMessage, type: import("../index.js").MessageUpsertType) => Promise<void>;
     appPatch: (patchCreate: import("../index.js").WAPatchCreate) => Promise<void>;
     sendPresenceUpdate: (type: import("../index.js").WAPresence, toJid?: string) => Promise<void>;
@@ -187,11 +139,11 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
     signalRepository: import("../index.js").SignalRepositoryWithLIDStore;
     user: import("../index.js").Contact | undefined;
     generateMessageTag: () => string;
-    query: (node: BinaryNode, timeoutMs?: number) => Promise<any>;
+    query: (node: import("../index.js").BinaryNode, timeoutMs?: number) => Promise<any>;
     waitForMessage: <T>(msgId: string, timeoutMs?: number | undefined) => Promise<T | undefined>;
     waitForSocketOpen: () => Promise<void>;
     sendRawMessage: (data: Uint8Array | Buffer) => Promise<void>;
-    sendNode: (frame: BinaryNode) => Promise<void>;
+    sendNode: (frame: import("../index.js").BinaryNode) => Promise<void>;
     logout: (msg?: string) => Promise<void>;
     end: (error: Error | undefined) => Promise<void>;
     registerSocketEndHandler: (handler: (error: Error | undefined) => void | Promise<void>) => void;
@@ -201,7 +153,7 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
     digestKeyBundle: () => Promise<void>;
     rotateSignedPreKey: () => Promise<void>;
     requestPairingCode: (phoneNumber: string, customPairingCode?: string) => Promise<string>;
-    updateServerTimeOffset: ({ attrs }: BinaryNode) => void;
+    updateServerTimeOffset: ({ attrs }: import("../index.js").BinaryNode) => void;
     sendUnifiedSession: () => Promise<void>;
     wamBuffer: import("../index.js").BinaryInfo;
     waitForConnectionUpdate: (check: (u: Partial<import("../index.js").ConnectionState>) => Promise<boolean | undefined>, timeoutMs?: number) => Promise<void>;
@@ -214,4 +166,5 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
     fetchAccountReachoutTimelock: () => Promise<import("../index.js").ReachoutTimelockState>;
     fetchNewChatMessageCap: () => Promise<import("../index.js").NewChatMessageCapInfo>;
 };
-//# sourceMappingURL=business.d.ts.map
+export type NewsletterSocket = ReturnType<typeof makeNewsletterSocket>;
+//# sourceMappingURL=newsletter.d.ts.map

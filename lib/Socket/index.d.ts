@@ -1,26 +1,68 @@
-import type { GetCatalogOptions, ProductCreate, ProductUpdate, SocketConfig, WAMediaUpload } from '../Types/index.js';
-import type { UpdateBussinesProfileProps } from '../Types/Bussines.js';
-import { type BinaryNode } from '../WABinary/index.js';
-export declare const makeBusinessSocket: (config: SocketConfig) => {
+import type { UserFacingSocketConfig } from '../Types/index.js';
+declare const makeWASocket: (config: UserFacingSocketConfig) => {
+    communityMetadata: (jid: string) => Promise<import("../index.js").GroupMetadata>;
+    communityCreate: (subject: string, body: string) => Promise<import("../index.js").GroupMetadata | null>;
+    communityCreateGroup: (subject: string, participants: string[], parentCommunityJid: string) => Promise<import("../index.js").GroupMetadata | null>;
+    communityLeave: (id: string) => Promise<void>;
+    communityUpdateSubject: (jid: string, subject: string) => Promise<void>;
+    communityLinkGroup: (groupJid: string, parentCommunityJid: string) => Promise<void>;
+    communityUnlinkGroup: (groupJid: string, parentCommunityJid: string) => Promise<void>;
+    communityFetchLinkedGroups: (jid: string) => Promise<{
+        communityJid: string;
+        isCommunity: boolean;
+        linkedGroups: {
+            id: string | undefined;
+            subject: string;
+            creation: number | undefined;
+            owner: string | undefined;
+            size: number | undefined;
+        }[];
+    }>;
+    communityRequestParticipantsList: (jid: string) => Promise<{
+        [key: string]: string;
+    }[]>;
+    communityRequestParticipantsUpdate: (jid: string, participants: string[], action: "approve" | "reject") => Promise<{
+        status: string;
+        jid: string | undefined;
+    }[]>;
+    communityParticipantsUpdate: (jid: string, participants: string[], action: import("../index.js").ParticipantAction) => Promise<{
+        status: string;
+        jid: string | undefined;
+        content: import("../index.js").BinaryNode;
+    }[]>;
+    communityUpdateDescription: (jid: string, description?: string) => Promise<void>;
+    communityInviteCode: (jid: string) => Promise<string | undefined>;
+    communityRevokeInvite: (jid: string) => Promise<string | undefined>;
+    communityAcceptInvite: (code: string) => Promise<string | undefined>;
+    communityRevokeInviteV4: (communityJid: string, invitedJid: string) => Promise<boolean>;
+    communityAcceptInviteV4: (key: string | import("../index.js").WAMessageKey, inviteMessage: import("../index.js").proto.Message.IGroupInviteMessage) => Promise<any>;
+    communityGetInviteInfo: (code: string) => Promise<import("../index.js").GroupMetadata>;
+    communityToggleEphemeral: (jid: string, ephemeralExpiration: number) => Promise<void>;
+    communitySettingUpdate: (jid: string, setting: "announcement" | "not_announcement" | "locked" | "unlocked") => Promise<void>;
+    communityMemberAddMode: (jid: string, mode: "admin_add" | "all_member_add") => Promise<void>;
+    communityJoinApprovalMode: (jid: string, mode: "on" | "off") => Promise<void>;
+    communityFetchAllParticipating: () => Promise<{
+        [_: string]: import("../index.js").GroupMetadata;
+    }>;
     logger: import("../Utils/logger.js").ILogger;
     getOrderDetails: (orderId: string, tokenBase64: string) => Promise<import("../index.js").OrderDetails>;
-    getCatalog: ({ jid, limit, cursor }: GetCatalogOptions) => Promise<{
+    getCatalog: ({ jid, limit, cursor }: import("../index.js").GetCatalogOptions) => Promise<{
         products: import("../index.js").Product[];
         nextPageCursor: string | undefined;
     }>;
     getCollections: (jid?: string, limit?: number) => Promise<{
         collections: import("../index.js").CatalogCollection[];
     }>;
-    productCreate: (create: ProductCreate) => Promise<import("../index.js").Product>;
+    productCreate: (create: import("../index.js").ProductCreate) => Promise<import("../index.js").Product>;
     productDelete: (productIds: string[]) => Promise<{
         deleted: number;
     }>;
-    productUpdate: (productId: string, update: ProductUpdate) => Promise<import("../index.js").Product>;
-    updateBussinesProfile: (args: UpdateBussinesProfileProps) => Promise<any>;
-    updateCoverPhoto: (photo: WAMediaUpload) => Promise<number>;
+    productUpdate: (productId: string, update: import("../index.js").ProductUpdate) => Promise<import("../index.js").Product>;
+    updateBussinesProfile: (args: import("../Types/Bussines.js").UpdateBussinesProfileProps) => Promise<any>;
+    updateCoverPhoto: (photo: import("../index.js").WAMediaUpload) => Promise<number>;
     removeCoverPhoto: (id: string) => Promise<any>;
-    sendMessageAck: (node: BinaryNode, errorCode?: number) => Promise<void>;
-    sendRetryRequest: (node: BinaryNode, forceIncludeKeys?: boolean) => Promise<void>;
+    sendMessageAck: (node: import("../index.js").BinaryNode, errorCode?: number) => Promise<void>;
+    sendRetryRequest: (node: import("../index.js").BinaryNode, forceIncludeKeys?: boolean) => Promise<void>;
     rejectCall: (callId: string, callFrom: string) => Promise<void>;
     fetchMessageHistory: (count: number, oldestMsgKey: import("../index.js").WAMessageKey, oldestMsgTimestamp: number | import("long").default) => Promise<string>;
     requestPlaceholderResend: (messageKey: import("../index.js").WAMessageKey, msgData?: Partial<import("../index.js").WAMessage>) => Promise<string | undefined>;
@@ -42,8 +84,8 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
         [_: string]: string;
     }>;
     sendPeerDataOperationMessage: (pdoMessage: import("../index.js").proto.Message.IPeerDataOperationRequestMessage) => Promise<string>;
-    createParticipantNodes: (recipientJids: string[], message: import("../index.js").proto.IMessage, extraAttrs?: BinaryNode["attrs"], dsmMessage?: import("../index.js").proto.IMessage) => Promise<{
-        nodes: BinaryNode[];
+    createParticipantNodes: (recipientJids: string[], message: import("../index.js").proto.IMessage, extraAttrs?: import("../index.js").BinaryNode["attrs"], dsmMessage?: import("../index.js").proto.IMessage) => Promise<{
+        nodes: import("../index.js").BinaryNode[];
         shouldIncludeDeviceIdentity: boolean;
     }>;
     getUSyncDevices: (jids: string[], useCache: boolean, ignoreZeroDevices: boolean) => Promise<(import("../index.js").JidWithDevice & {
@@ -64,7 +106,7 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
     newsletterUnmute: (jid: string) => Promise<unknown>;
     newsletterUpdateName: (jid: string, name: string) => Promise<unknown>;
     newsletterUpdateDescription: (jid: string, description: string) => Promise<unknown>;
-    newsletterUpdatePicture: (jid: string, content: WAMediaUpload) => Promise<unknown>;
+    newsletterUpdatePicture: (jid: string, content: import("../index.js").WAMediaUpload) => Promise<unknown>;
     newsletterRemovePicture: (jid: string) => Promise<unknown>;
     newsletterReactMessage: (jid: string, serverId: string, reaction?: string) => Promise<void>;
     newsletterFetchMessages: (jid: string, count: number, since: number, after: number) => Promise<any>;
@@ -89,7 +131,7 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
     groupParticipantsUpdate: (jid: string, participants: string[], action: import("../index.js").ParticipantAction) => Promise<{
         status: string;
         jid: string | undefined;
-        content: BinaryNode;
+        content: import("../index.js").BinaryNode;
     }[]>;
     groupUpdateDescription: (jid: string, description?: string) => Promise<void>;
     groupInviteCode: (jid: string) => Promise<string | undefined>;
@@ -134,7 +176,7 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
     fetchBlocklist: () => Promise<(string | undefined)[]>;
     fetchStatus: (...jids: string[]) => Promise<import("../index.js").USyncQueryResultList[] | undefined>;
     fetchDisappearingDuration: (...jids: string[]) => Promise<import("../index.js").USyncQueryResultList[] | undefined>;
-    updateProfilePicture: (jid: string, content: WAMediaUpload, dimensions?: {
+    updateProfilePicture: (jid: string, content: import("../index.js").WAMediaUpload, dimensions?: {
         width: number;
         height: number;
     }) => Promise<void>;
@@ -187,11 +229,11 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
     signalRepository: import("../index.js").SignalRepositoryWithLIDStore;
     user: import("../index.js").Contact | undefined;
     generateMessageTag: () => string;
-    query: (node: BinaryNode, timeoutMs?: number) => Promise<any>;
+    query: (node: import("../index.js").BinaryNode, timeoutMs?: number) => Promise<any>;
     waitForMessage: <T>(msgId: string, timeoutMs?: number | undefined) => Promise<T | undefined>;
     waitForSocketOpen: () => Promise<void>;
     sendRawMessage: (data: Uint8Array | Buffer) => Promise<void>;
-    sendNode: (frame: BinaryNode) => Promise<void>;
+    sendNode: (frame: import("../index.js").BinaryNode) => Promise<void>;
     logout: (msg?: string) => Promise<void>;
     end: (error: Error | undefined) => Promise<void>;
     registerSocketEndHandler: (handler: (error: Error | undefined) => void | Promise<void>) => void;
@@ -201,7 +243,7 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
     digestKeyBundle: () => Promise<void>;
     rotateSignedPreKey: () => Promise<void>;
     requestPairingCode: (phoneNumber: string, customPairingCode?: string) => Promise<string>;
-    updateServerTimeOffset: ({ attrs }: BinaryNode) => void;
+    updateServerTimeOffset: ({ attrs }: import("../index.js").BinaryNode) => void;
     sendUnifiedSession: () => Promise<void>;
     wamBuffer: import("../index.js").BinaryInfo;
     waitForConnectionUpdate: (check: (u: Partial<import("../index.js").ConnectionState>) => Promise<boolean | undefined>, timeoutMs?: number) => Promise<void>;
@@ -214,4 +256,5 @@ export declare const makeBusinessSocket: (config: SocketConfig) => {
     fetchAccountReachoutTimelock: () => Promise<import("../index.js").ReachoutTimelockState>;
     fetchNewChatMessageCap: () => Promise<import("../index.js").NewChatMessageCapInfo>;
 };
-//# sourceMappingURL=business.d.ts.map
+export default makeWASocket;
+//# sourceMappingURL=index.d.ts.map
